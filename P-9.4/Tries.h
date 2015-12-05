@@ -37,8 +37,8 @@ private:
 public:
 	int match(string lhs, string rhs);
 	const vector<int>& search(string keyword,bool print);
-	void loadFromFile(char* filename);
-	void savetoFile(char* filename);
+	void loadFromFile(const char* filename);
+	void savetoFile(const char* filename);
 	void compress();
 	void print();
 	void insert(string keyword, int index);

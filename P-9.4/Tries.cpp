@@ -95,7 +95,7 @@ const vector<int>& Tries::search(string keyword,bool print=false)
 
 	return empty;
 }
-void Tries::loadFromFile(char* filename)
+void Tries::loadFromFile(const char* filename)
 {
 	clear();
 	ifstream file(filename);
@@ -178,7 +178,7 @@ void Tries::loadFromFile(char* filename)
 		}
 	}
 }
-void Tries::savetoFile(char* filename)
+void Tries::savetoFile(const char* filename)
 {
 	ofstream file(filename);
 	file << "root" << endl;
@@ -282,6 +282,10 @@ void Tries::insert(string keyword, int index)
 				p->successor.push_back(next);
 				p = next;
 			}
+		}
+		for (auto it = p->index.begin(); it != p->index.end(); ++it)
+		{
+			if (*it == index)return;
 		}
 		p->index.push_back(index);
 	}
