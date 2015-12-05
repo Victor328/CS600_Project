@@ -77,7 +77,7 @@ void HTTP_Client::get_keyword_list(vector<string>& result, string filename)
 	html_file.close();
 }
 
-string HTTP_Client::fetch(string url)
+int HTTP_Client::fetch(string url, string file_name)
 {
 	cout << "fetching " << url << "...";
 	string host_addr;
@@ -90,12 +90,11 @@ string HTTP_Client::fetch(string url)
 	if (html_path == "")html_path = "/";
 
 	string get_cmd;
-	string file_name;
 	WSADATA wsaData;
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
 		cout << "WSAStartup failed.\n";
 		system("pause");
-		return "";
+		return -1;
 	}
 
 	SOCKET Socket = INVALID_SOCKET;
@@ -123,7 +122,7 @@ string HTTP_Client::fetch(string url)
 		if (Socket == INVALID_SOCKET) {
 			printf("socket failed with error: %ld\n", WSAGetLastError());
 			WSACleanup();
-			return "";
+			return -1;
 		}
 
 		// Connect to server.		
@@ -135,9 +134,6 @@ string HTTP_Client::fetch(string url)
 		break;
 	}
 	freeaddrinfo(result);
-
-	file_name = "tempfile_" + to_string(temp_file_count) + ".txt";
-	//temp_file_count++;
 
 	ofstream file(file_name.c_str());
 
@@ -156,5 +152,5 @@ string HTTP_Client::fetch(string url)
 	file.close();
 	closesocket(Socket);
 	WSACleanup();
-	return file_name;
+	return 0;
 }

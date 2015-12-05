@@ -19,6 +19,6 @@ public:
 	~HTTP_Client();
 	void get_url_list(string host_addr, vector<string>& result, string filename);
 	void get_keyword_list(vector<string>& result, string filename);
-	string fetch(string url);
+	int fetch(string url, string file_name);
 };
 

@@ -7,7 +7,8 @@ void create_dictionary(Tries& dict, HTTP_Client& net,string current_url="http://
 {
 	if (lvl > 1)return;
 	vector<string> re;
-	string temp_file_name = net.fetch(current_url);
+	string temp_file_name = "Tempfile.txt";
+	net.fetch(current_url,temp_file_name);
 	net.get_keyword_list(re, temp_file_name);
 	for (auto it = re.begin(); it != re.end(); ++it)
 	{
@@ -15,11 +16,12 @@ void create_dictionary(Tries& dict, HTTP_Client& net,string current_url="http://
 	}
 	url_count++;
 	std::fstream fs;
-	fs.open("url_list.txt", std::fstream::out | std::fstream::app);
+	if(lvl!=0)fs.open("url_list.txt", std::fstream::out | std::fstream::app);
+	else fs.open("url_list.txt", std::fstream::out);
 	fs << current_url << endl;
 	fs.close();
 	net.get_url_list(current_url,re, temp_file_name);
-	//remove(temp_file_name.c_str());
+	remove(temp_file_name.c_str());
 	for (auto it = re.begin(); it != re.end(); ++it)
 	{
 		create_dictionary(dict, net, *it, lvl + 1);
