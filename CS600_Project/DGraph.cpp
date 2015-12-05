@@ -74,7 +74,6 @@ void DGraph::maxFlow(int *(*pathFunc)(int* flow, int* network, int size,int sour
 	int* augmentingPath = pathFunc(actrualFlow,adjacentMatrix,size,source,sink);
 	while (augmentingPath != NULL)
 	{
-		std::cout << std::endl;
 		int rc = residualCapacity(actrualFlow, augmentingPath);
 		pushFlow(actrualFlow, augmentingPath, rc);
 		delete[] augmentingPath;

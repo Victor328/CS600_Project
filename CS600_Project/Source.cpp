@@ -1,8 +1,12 @@
 #include "DGraph.h"
 #include <vector>
+int count_DFS = 0;
+int count_Edmonds_Karp = 0;
+int count_R_DFS = 0;
 
 int* pathfunc_DFS(int* flow, int* network, int size, int source, int sink)
 {
+	count_DFS++;
 	std::vector<int> path;
 	bool* edge_visited = new bool[size*size];
 	for (int i = 0; i < size*size; i++)edge_visited[i] = false;
@@ -46,13 +50,12 @@ int* pathfunc_DFS(int* flow, int* network, int size, int source, int sink)
 	int* re = new int[path.size()+1];
 	re[0] = path.size();
 	for (int i = 1; i <= re[0]; i++)re[i] = path[i - 1];
-	for (int i = 1; i <= re[0]; i++)std::cout << re[i] << " ";
-	std::cout << std::endl;
 	return re;
 }
 
 int* pathfunc_Edmonds_Karp(int* flow, int* network, int size, int source, int sink)
 {
+	count_Edmonds_Karp++;
 	struct node
 	{
 		int value;
@@ -73,7 +76,6 @@ int* pathfunc_Edmonds_Karp(int* flow, int* network, int size, int source, int si
 	while (queue_front<todo_queue.size())
 	{
 		current_vertex = todo_queue[queue_front].value;
-		//if (current_vertex == sink)break;
 		for (int i = 0; i < size; i++)
 		{
 			if (!edge_visited[current_vertex + i*size] &&
@@ -117,12 +119,12 @@ int* pathfunc_Edmonds_Karp(int* flow, int* network, int size, int source, int si
 	int* re = new int[path.size()+1];
 	re[0] = path.size();
 	for (int i = 1; i <= re[0]; i++)re[i] = path[re[0]-i];
-	for (int i = 1; i <= re[0]; i++)std::cout << re[i] << " ";
 	return re;
 }
 
 int* pathfunc_R_DFS(int* flow, int* network, int size, int source, int sink)
 {
+	count_R_DFS++;
 	int* residual_graph = new int[size*size];
 	for (int i = 0; i < size*size; i++)residual_graph[i] = -1;
 	for (int i = 0; i < size; i++)
@@ -138,15 +140,6 @@ int* pathfunc_R_DFS(int* flow, int* network, int size, int source, int sink)
 			}
 
 		}
-	}
-
-	for (int i = 0; i < size; i++)
-	{
-		for (int j = 0; j < size; j++)
-		{
-			printf_s("%2d ", residual_graph[j+i*size]);
-		}
-		std::cout << std::endl;
 	}
 
 	std::vector<int> path;
@@ -183,8 +176,6 @@ int* pathfunc_R_DFS(int* flow, int* network, int size, int source, int sink)
 	int* re = new int[path.size() + 1];
 	re[0] = path.size();
 	for (int i = 1; i <= re[0]; i++)re[i] = path[i - 1];
-	for (int i = 1; i <= re[0]; i++)std::cout << re[i] << " ";
-	std::cout << std::endl;
 	return re;
 
 	return NULL;
@@ -192,10 +183,26 @@ int* pathfunc_R_DFS(int* flow, int* network, int size, int source, int sink)
 
 void main()
 {
+	using namespace std;
 	DGraph flowMap;
-	flowMap.readFromFile("network_1.txt");
+	cout << "CS 600 Project P-8.2" << endl << "Ford Fulkerson algorithm" << endl;
+	cout << "Zijie Zhang 10400100" << endl << endl;
+	cout << "Reading flow network from network.txt...";
+	flowMap.readFromFile("network.txt");
+	cout << "done" << endl<<endl;
+	cout << "Adjacent Matrix of network:" << endl << endl;
 	flowMap.print();
+	cout << "Calculating Maximum flow with DFS..." ;
+	flowMap.maxFlow(pathfunc_DFS);
+	cout << "done. Iterations used:" << count_DFS << endl;
+	flowMap.printMaxFlow();
+	cout << endl << "Calculating Maximum flow with Edmonds Karp algorithm...";
+	flowMap.maxFlow(pathfunc_Edmonds_Karp);
+	cout << "done. Iterations used:" << count_Edmonds_Karp << endl;
+	flowMap.printMaxFlow();
+	cout << endl << "Calculating Maximum flow using DFS with Residual Graph...";
 	flowMap.maxFlow(pathfunc_R_DFS);
+	cout << "done. Iterations used:" << count_R_DFS << endl;
 	flowMap.printMaxFlow();
 
 	system("pause");
