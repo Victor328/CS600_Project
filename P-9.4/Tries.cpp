@@ -57,7 +57,7 @@ int Tries::match(string lhs, string rhs)
 	return i;
 }
 
-const vector<int>& Tries::search(string keyword,bool print=false)
+const vector<int>& Tries::search(string keyword,bool print)
 {
 	lowercase(keyword);
 	int* re;

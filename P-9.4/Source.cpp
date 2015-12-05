@@ -1,12 +1,14 @@
 #include "Tries.h"
 #include "HTTP_Client.h"
+#include <algorithm>
 
 static int url_count = 0;
 int max_level = 2;
+string host_url = "http://www.cplusplus.com/";
 
 void create_dictionary(Tries& dict, HTTP_Client& net,string current_url="http://www.cplusplus.com/",int lvl=0)
 {
-	if (lvl > max_level)return;
+	if (lvl > max_level || url_count>300)return;
 	vector<string> re;
 	string temp_file_name = "Tempfile.txt";
 	net.fetch(current_url,temp_file_name);
@@ -21,7 +23,7 @@ void create_dictionary(Tries& dict, HTTP_Client& net,string current_url="http://
 	else fs.open("url_list.txt", std::fstream::out);
 	fs << current_url << endl;
 	fs.close();
-	net.get_url_list(current_url,re, temp_file_name);
+	net.get_url_list(host_url,re, temp_file_name);
 	remove(temp_file_name.c_str());
 	
 	for (auto it = re.begin(); it != re.end(); ++it)                            //Recursively search all urls mentioned
@@ -52,10 +54,12 @@ void show_help()
 	cout << "    Load saved dictionary (keywords) into compressed Tries" << endl;
 	cout << "save [filename]" << endl;
 	cout << "    Save keywords in Tries into [filename]." << endl;
-	cout << "search [keyword]" << endl;
-	cout << "    Search for matching result of [keyword]s." << endl;
+	cout << "search [keyword1] [keyword2] ..." << endl;
+	cout << "    Search for matching result of given keywords." << endl;
 	cout << "depth [maximum]" << endl;
-	cout << "    Set the maximum search depth when making dictionary. Default is 2." << endl;
+	cout << "    Set the maximum search depth when making dictionary. Default is 2. The" << endl;
+	cout << "    program will end searching if depth exceeds [maximum] or the number of" << endl;
+	cout << "    urls saved is over 300" << endl;
 }
 
 void main()
@@ -91,8 +95,52 @@ void main()
 		}
 		else if (cmd == "search")
 		{
-			cin >> filename;
-			dict.search(filename, true);
+			string line;
+			vector<string> keyword;
+			vector<int> re;
+			getline(cin, line);
+			line = line.substr(1);
+			line = line + "  ";
+			for (int i = 0; i < line.size(); i++)
+			{
+				if (line[i] == ' ')
+				{
+					keyword.push_back(line.substr(0, i));
+					line = line.substr(i+1);
+					i = 0;					
+				}
+			}
+			for (auto key : keyword)
+			{
+				if(re.empty())re=dict.search(key);
+				else
+				{
+					vector<int> temp = dict.search(key);
+					vector<int> intersection(20);
+					sort(re.begin(), re.end());
+					sort(temp.begin(), temp.end());
+
+					auto it = std::set_intersection(re.begin(), re.end(), temp.begin(), temp.end(), intersection.begin());
+					intersection.resize(it - intersection.begin());
+					re = intersection;
+				}
+			}
+			vector<string> urls;
+			ifstream file("url_list.txt");
+			int count = 0;
+			while (file >> line)
+			{
+				for (auto it = re.begin(); it != re.end(); ++it)
+				{
+					if (count == *it)
+					{
+						urls.push_back(line);
+						break;
+					}
+				}
+				count++;
+			}
+			for(auto it:urls)cout << "  " << it << endl;
 		}
 		else if (cmd == "depth")
 		{
