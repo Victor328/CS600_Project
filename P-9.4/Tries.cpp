@@ -220,19 +220,23 @@ void Tries::compress(node* p)
 	if (p->successor.size() == 1)
 	{
 		compress(p->successor[0]);
-		if (p->successor[0]->successor.empty())
+		if (p->index.empty())
 		{
-			p->str = p->str + p->successor[0]->str;
-			p->index.swap(p->successor[0]->index);
-			p->successor.pop_back();
-		}
-		else
-		{
-			node* temp = p->successor[0];
-			p->successor.clear();
-			p->successor.swap(temp->successor);
-			p->str = p->str + temp->str;
-			delete temp;
+			if (p->successor[0]->successor.empty())
+			{
+				p->str = p->str + p->successor[0]->str;
+				p->index.swap(p->successor[0]->index);
+				p->successor.pop_back();
+			}
+			else
+			{
+				node* temp = p->successor[0];
+				p->successor.clear();
+				p->successor.swap(temp->successor);
+				p->index.swap(temp->index);
+				p->str = p->str + temp->str;
+				delete temp;
+			}
 		}
 	}
 	else

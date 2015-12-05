@@ -80,13 +80,16 @@ void main()
 		}
 		else if (cmd == "makedict")
 		{
+			dict.clear();
 			create_dictionary(dict, net);
+			dict.compress();
 			cout << "Dicionary successfully created." << endl;
 		}
 		else if (cmd == "load")
 		{
 			cin >> filename;
 			dict.loadFromFile(filename.c_str());
+			dict.compress();
 		}
 		else if (cmd == "save")
 		{
